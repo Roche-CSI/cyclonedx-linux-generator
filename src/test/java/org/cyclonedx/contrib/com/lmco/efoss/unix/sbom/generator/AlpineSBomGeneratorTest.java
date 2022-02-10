@@ -48,7 +48,7 @@ class AlpineSBomGeneratorTest extends BaseSBomGeneratorTest
 	private ProcessBuilder pbMock = new ProcessBuilder();
 	
 	@InjectMocks
-	private AlpineSBomGenerator generator = new AlpineSBomGenerator();
+	private AlpineSBomGenerator generator = new AlpineSBomGenerator(null);
 	
 	/**
 	 * (U) This method is used to test the reading of a version from the process.

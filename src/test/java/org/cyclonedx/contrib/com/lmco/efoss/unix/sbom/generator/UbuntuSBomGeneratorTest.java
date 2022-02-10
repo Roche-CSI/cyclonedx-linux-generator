@@ -53,7 +53,7 @@ class UbuntuSBomGeneratorTest extends BaseSBomGeneratorTest
 	private ProcessBuilder pbMock = new ProcessBuilder();
 	
 	@InjectMocks
-	private UbuntuSBomGenerator generator = new UbuntuSBomGenerator();
+	private UbuntuSBomGenerator generator = new UbuntuSBomGenerator(null);
 	
 	/**
 	 * (U) This method is used to test the parsing of the Map into External References.

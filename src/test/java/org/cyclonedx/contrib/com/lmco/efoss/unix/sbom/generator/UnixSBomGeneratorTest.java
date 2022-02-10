@@ -47,7 +47,7 @@ class UnixSBomGeneratorTest extends BaseSBomGeneratorTest
 	
 	public Log4JTestWatcher watcher = new Log4JTestWatcher(LOG4J_FILE, this.getClass().getName());
 	
-	private UnixSBomGenerator generator = new UnixSBomGenerator();
+	private UnixSBomGenerator generator = new UnixSBomGenerator(null);
 	
 	/**
 	 * (U) This test method test to make sure the Unix Property Manager is added to the list of

@@ -12,6 +12,7 @@ package org.cyclonedx.contrib.com.lmco.efoss.unix.sbom.generator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,10 @@ public class AlpineSBomGenerator extends UnixSBomGenerator
 	private static final String SOFTWARE_VERSION_CMD = "apk policy ";
 	
 	private ProcessBuilder processBuilder = new ProcessBuilder();
+	
+	public AlpineSBomGenerator(Path cache) {
+		super(cache);
+	}
 	
 	/**
 	 * (U) This method is used to generate the Software Bill Of Materials (SBOM) for all RedHat

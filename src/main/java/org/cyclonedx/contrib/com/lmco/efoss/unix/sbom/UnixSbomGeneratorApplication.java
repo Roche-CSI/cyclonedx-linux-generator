@@ -121,7 +121,8 @@ public class UnixSbomGeneratorApplication
 						"Version value to assign to top level component."));
 		cliOptions.addOption(new Option("nc", "no-components", false, "Will only campture master " +
 						"component.  Will not include any components in the list of Components."));
-
+		cliOptions.addOption(Option.builder("cache").argName("directory").hasArg().desc("A directory to use for caching small results of long-running operations (e.g. version lookup)").build());
+		
 		return cliOptions;
 	}
 

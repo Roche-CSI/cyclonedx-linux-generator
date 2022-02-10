@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,10 @@ public class RedHatSBomGenerator extends UnixSBomGenerator
 	private static final String SOFTWARE_LIST_CMD = "yum list installed";
 	
 	private ProcessBuilder processBuilder = new ProcessBuilder();
+	
+	public RedHatSBomGenerator(Path cache) {
+		super(cache);
+	}
 	
 	/**
 	 * (U) This method is used to generate the Software Bill Of Materials (SBOM) for all RedHat
