@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,10 +63,11 @@ public class UbuntuSBomGenerator extends UnixSBomGenerator
 		String group = null;
 		LicenseChoice license = null;
 		Component component = null;
-		for (String software : softwareList)
+		for (int i = 0; i < softwareList.size(); i++)
 		{
+			final String software = softwareList.get(i);
 			if (logger.isDebugEnabled())
-				logger.debug("Generating Component (" + software + ")");
+				logger.debug("Generating Component (" + software + "), " + (softwareList.size() - i - 1) + " of " + softwareList.size() + " components remaining");
 			detailMap = produceDetailMap(software);
 			version = detailMap.get("Version");
 			group = detailMap.get("Release");
@@ -97,19 +99,37 @@ public class UbuntuSBomGenerator extends UnixSBomGenerator
 		
 		processBuilder.command("bash", "-c", cmd);
 		
-		try
-		{
-			Process process = processBuilder.start();
-			
-			version = readVersion(process);
+		final List<Throwable> suppresseds = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			try
+			{
+				try
+				{
+					Process process = processBuilder.start();
+					version = readVersion(process);
+					suppresseds.clear();
+					break;
+				}
+				catch (IOException ioe)
+				{
+					String error = "Unable to build unix process to get software version (" +
+							cmd +
+							") on the server!";
+					logger.error(error, ioe);
+					throw new SBomException(error, ioe);
+				}
+			}
+			catch (Throwable throwable)
+			{
+				suppresseds.add(throwable);
+			}
 		}
-		catch (IOException ioe)
-		{
-			String error = "Unable to build unix process to get software version (" +
-					cmd +
-					") on the server!";
-			logger.error(error, ioe);
-			throw new SBomException(error, ioe);
+		if (!suppresseds.isEmpty()) {
+			final SBomException throwable = new SBomException("Unable to run unix process to get software version (" + cmd + ") on the server!");
+			for (Throwable suppressed : suppresseds) {
+				throwable.addSuppressed(suppressed);
+			}
+			throw throwable;
 		}
 		
 		if (logger.isDebugEnabled())
