@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -233,6 +234,8 @@ public class SBomGenerator
 		Bom bom = null;
 		
 		int softwareSize = 0;
+		
+		final Path cache = cli.hasOption("cache") ? Paths.get(cli.getOptionValue("cache")) : null;
 
 		if (cli.hasOption("nc"))
 		{
@@ -245,7 +248,7 @@ public class SBomGenerator
 			{
 				if (logger.isInfoEnabled())
 					logger.info(vendor + ", uses the APK package manager.");
-				AlpineSBomGenerator generator = new AlpineSBomGenerator();
+				AlpineSBomGenerator generator = new AlpineSBomGenerator(cache);
 				bom = generator.generateSBom();
 			}
 			else if ((vendor.toUpperCase().trim().contains(UBUNTU)) ||
@@ -253,14 +256,14 @@ public class SBomGenerator
 			{
 				if (logger.isInfoEnabled())
 					logger.info(vendor + ", uses the APT package manager.");
-				UbuntuSBomGenerator generator = new UbuntuSBomGenerator();
+				UbuntuSBomGenerator generator = new UbuntuSBomGenerator(cache);
 				bom = generator.generateSBom();
 			}
 			else
 			{
 				if (logger.isInfoEnabled())
 					logger.info(vendor + ", assuming it is a redhat flavor (Yum Package Manager).");
-				RedHatSBomGenerator generator = new RedHatSBomGenerator();
+				RedHatSBomGenerator generator = new RedHatSBomGenerator(cache);
 				bom = generator.generateSBom();
 			}
 		}

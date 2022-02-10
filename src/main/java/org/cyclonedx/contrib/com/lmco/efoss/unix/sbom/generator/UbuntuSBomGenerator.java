@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,10 @@ public class UbuntuSBomGenerator extends UnixSBomGenerator
 	public static final String SOFTWARE_LIST_CMD = "apt list --installed";
 	
 	private ProcessBuilder processBuilder = new ProcessBuilder();
+	
+	public UbuntuSBomGenerator(Path cache) {
+		super(cache);
+	}
 	
 	/**
 	 * (U) This method is used to generate the Software Bill Of Materials (SBOM) for all Ubuntu
@@ -90,47 +95,49 @@ public class UbuntuSBomGenerator extends UnixSBomGenerator
 	 */
 	public String getInstalledVersion(String software)
 	{
-		String version = "";
-		
-		String cmd = SOFTWARE_INSTALLED_VERSION + " " + software;
-		
-		if (logger.isDebugEnabled())
-			logger.debug("Attempting to get software (" + software + ") version via: " + cmd);
-		
-		processBuilder.command("bash", "-c", cmd);
-		
-		final List<Throwable> suppresseds = new ArrayList<>();
-		for (int i = 0; i < 3; i++) {
-			try
-			{
+		final String version = get(software, s -> {
+			String cmd = SOFTWARE_INSTALLED_VERSION + " " + s;
+			
+			if (logger.isDebugEnabled())
+				logger.debug("Attempting to get software (" + s + ") version via: " + cmd);
+			
+			processBuilder.command("bash", "-c", cmd);
+			
+			final List<Throwable> suppresseds = new ArrayList<>();
+			for (int i = 0; i < 3; i++) {
 				try
 				{
-					Process process = processBuilder.start();
-					version = readVersion(process);
-					suppresseds.clear();
-					break;
+					try
+					{
+						Process process = processBuilder.start();
+						return readVersion(process);
+					}
+					catch (IOException ioe)
+					{
+						String error = "Unable to build unix process to get software version (" +
+								cmd +
+								") on the server!";
+						logger.error(error, ioe);
+						throw new SBomException(error, ioe);
+					}
 				}
-				catch (IOException ioe)
+				catch (Throwable throwable)
 				{
-					String error = "Unable to build unix process to get software version (" +
-							cmd +
-							") on the server!";
-					logger.error(error, ioe);
-					throw new SBomException(error, ioe);
+					suppresseds.add(throwable);
+					try {
+						synchronized (this) {
+							this.wait(5000);
+						}
+					} catch (Throwable t) {}
 				}
 			}
-			catch (Throwable throwable)
-			{
-				suppresseds.add(throwable);
-			}
-		}
-		if (!suppresseds.isEmpty()) {
+			
 			final SBomException throwable = new SBomException("Unable to run unix process to get software version (" + cmd + ") on the server!");
 			for (Throwable suppressed : suppresseds) {
 				throwable.addSuppressed(suppressed);
 			}
 			throw throwable;
-		}
+		});
 		
 		if (logger.isDebugEnabled())
 			logger.debug("Found Version (" + version + ") for " + software + ".");

@@ -49,7 +49,7 @@ class RedHatSBomGeneratorTest extends BaseSBomGeneratorTest
 	public Log4JTestWatcher watcher = new Log4JTestWatcher(LOG4J_FILE, this.getClass().getName());
 	
 	@InjectMocks
-	private RedHatSBomGenerator generator = new RedHatSBomGenerator();
+	private RedHatSBomGenerator generator = new RedHatSBomGenerator(null);
 	
 	@Mock
 	private ProcessBuilder pbMock = new ProcessBuilder();

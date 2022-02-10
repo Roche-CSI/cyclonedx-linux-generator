@@ -12,12 +12,17 @@ package org.cyclonedx.contrib.com.lmco.efoss.unix.sbom.generator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.apache.log4j.Logger;
+import org.cyclonedx.contrib.com.lmco.efoss.unix.sbom.exceptions.SBomException;
 import org.cyclonedx.model.AttachmentText;
 import org.cyclonedx.model.Component;
 import org.cyclonedx.model.Component.Scope;
@@ -28,7 +33,6 @@ import org.cyclonedx.model.LicenseChoice;
 import org.cyclonedx.model.Property;
 
 import com.google.common.base.CharMatcher;
-import org.cyclonedx.contrib.com.lmco.efoss.unix.sbom.exceptions.SBomException;
 
 /**
  * (U) This class is the UnixSBomGenerator, it contains shared methods, used by the 
@@ -50,6 +54,36 @@ public class UnixSBomGenerator
 			"get details for a specific piece of software.";
 	
 	protected static final String SOFTWARE_LICENSE_DIR = "/usr/share/doc/";
+	
+	protected final Path cache;
+	
+	public UnixSBomGenerator(Path cache) {
+		this.cache = cache;
+	}
+	
+	protected String get(String key, Function<? super String, ? extends String> generator) {
+		if (cache != null) {
+			final Path path = cache.resolve(key);
+			if (Files.exists(path)) {
+				try {
+					return Files.readString(path);
+				} catch (IOException e) {
+					logger.error("Failed to read cache entry from " + path + ", falling back to computation!", e);
+				}
+			}
+		}
+		
+		final String retVal = generator.apply(key);
+		if (cache != null) {
+			final Path path = cache.resolve(key);
+			try {
+				Files.writeString(path, retVal, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+			} catch (IOException e) {
+				logger.error("Failed to write cache entry to " + path + ", continuing anyway", e);
+			}
+		}
+		return retVal;
+	}
 	
 	/**
 	 * (U) This method is used to build the External References. To include the Web Page, Bugs, and
