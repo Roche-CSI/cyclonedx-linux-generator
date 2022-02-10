@@ -63,10 +63,11 @@ public class UbuntuSBomGenerator extends UnixSBomGenerator
 		String group = null;
 		LicenseChoice license = null;
 		Component component = null;
-		for (String software : softwareList)
+		for (int i = 0; i < softwareList.size(); i++)
 		{
+			final String software = softwareList.get(i);
 			if (logger.isDebugEnabled())
-				logger.debug("Generating Component (" + software + ")");
+				logger.debug("Generating Component (" + software + "), " + (softwareList.size() - i - 1) + " of " + softwareList.size() + " components remaining");
 			detailMap = produceDetailMap(software);
 			version = detailMap.get("Version");
 			group = detailMap.get("Release");
