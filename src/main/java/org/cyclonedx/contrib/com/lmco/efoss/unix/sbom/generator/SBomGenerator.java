@@ -113,9 +113,9 @@ public class SBomGenerator
 	 * @param format Enumeration that tell us which file we are producing.
 	 * @throws SBomException if we are unable to produce the file.
 	 */
-	public static void createBomFile(Bom bom, SBomCommons.AVAILABLE_FORMATS format)
+	public static void createBomFile(Path output, Bom bom, SBomCommons.AVAILABLE_FORMATS format)
 	{
-		File file = new File("output/bom." + format.toString().toLowerCase());
+		File file = output.resolve("bom." + format.toString().toLowerCase()).toFile();
 		try (FileWriter writer = new FileWriter(file))
 		{
 			writer.write(SBomCommons.generateOutputString(bom, format));
@@ -193,7 +193,7 @@ public class SBomGenerator
 	 * @param bom Bill of Materials to create the files form.
 	 * @throws SBomException in the event we can NOT create either the XML of JSon files.
 	 */
-	public static void generateBoms(Bom bom)
+	public static void generateBoms(Path output, Bom bom)
 	{
 		try
 		{	
@@ -202,8 +202,8 @@ public class SBomGenerator
 			
 			Files.createDirectories(Paths.get("output"));
 			
-			createBomFile(bom, SBomCommons.AVAILABLE_FORMATS.XML);
-			createBomFile(bom, SBomCommons.AVAILABLE_FORMATS.JSON);
+			createBomFile(output, bom, SBomCommons.AVAILABLE_FORMATS.XML);
+			createBomFile(output, bom, SBomCommons.AVAILABLE_FORMATS.JSON);
 		}
 		catch (IOException ioe)
 		{
@@ -236,6 +236,7 @@ public class SBomGenerator
 		int softwareSize = 0;
 		
 		final Path cache = cli.hasOption("cache") ? Paths.get(cli.getOptionValue("cache")) : null;
+		final Path output = cli.hasOption("output") ? Paths.get(cli.getOptionValue("output")) : Paths.get("output");
 
 		if (cli.hasOption("nc"))
 		{
@@ -273,7 +274,7 @@ public class SBomGenerator
 			addBomTools(bom);
 			bom.getMetadata().setComponent(master);
 			softwareSize = bom.getComponents().size();
-			generateBoms(bom);
+			generateBoms(output, bom);
 		}
 		return softwareSize;
 	}
