@@ -25,5 +25,5 @@ then
 fi
 
 echo "Found $JAR"
-$JAVA_HOME/bin/java -Xms768m -Xmx8192m -Dlog4j.configuration=file:./logging/log4j.xml -jar "$JAR" "$@"
+$JAVA_HOME/bin/java -Xms768m -Xmx8192m -jar "$JAR" "$@"
 exit $?
