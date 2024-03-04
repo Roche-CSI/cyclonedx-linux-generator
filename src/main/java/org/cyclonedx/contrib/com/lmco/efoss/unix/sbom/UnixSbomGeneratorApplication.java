@@ -122,6 +122,7 @@ public class UnixSbomGeneratorApplication
 		cliOptions.addOption(new Option("nc", "no-components", false, "Will only campture master " +
 						"component.  Will not include any components in the list of Components."));
 		cliOptions.addOption(Option.builder("cache").argName("directory").hasArg().desc("A directory to use for caching small results of long-running operations (e.g. version lookup)").build());
+		cliOptions.addOption(Option.builder("output").argName("directory").hasArg().desc("The directory in which to place the generated SBOMs bom.xml and bom.json (defaults to \"output\")").build());
 		
 		return cliOptions;
 	}

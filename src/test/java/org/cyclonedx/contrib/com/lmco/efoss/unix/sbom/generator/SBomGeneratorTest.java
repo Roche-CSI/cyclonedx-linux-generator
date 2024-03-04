@@ -108,7 +108,7 @@ class SBomGeneratorTest
 				
 			watcher.getLogger().info("sbom: " + sbom.toString());
 				
-			SBomGenerator.generateBoms(sbom);
+			SBomGenerator.generateBoms(Paths.get("output"), sbom);
 				
 			Bom generatedSbom = parser.parse(new File("output/bom.xml"));
 				
