@@ -6,6 +6,11 @@
 	<!-- Roche-CSI: New maven config to support deployment to gh packages -->
 	<servers>
 		<server>
+			<id>github-Roche-CSI</id>
+			<username>${env.GITHUB_ACTOR}</username>
+			<password>${env.GITHUB_TOKEN}</password>
+		</server>
+		<server>
 			<id>github-deploy</id>
 			<username>${env.GITHUB_ACTOR}</username>
 			<password>${env.GITHUB_TOKEN}</password>
