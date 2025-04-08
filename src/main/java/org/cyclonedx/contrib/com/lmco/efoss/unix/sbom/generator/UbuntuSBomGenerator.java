@@ -36,9 +36,9 @@ public class UbuntuSBomGenerator extends UnixSBomGenerator
 {
 	private static final String PACKAGE_MANAGER = "apt";
 	
-	private static final String SOFTWARE_INSTALLED_VERSION = "apt policy";
-	private static final String SOFTWARE_DETAIL_CMD = "apt show";
-	public static final String SOFTWARE_LIST_CMD = "apt list --installed";
+        private static final String SOFTWARE_INSTALLED_VERSION = "apt-cache show";
+        private static final String SOFTWARE_DETAIL_CMD = "apt-cache show";
+        public static final String SOFTWARE_LIST_CMD = "apt-cache pkgnames";	
 	
 	private ProcessBuilder processBuilder = new ProcessBuilder();
 	
@@ -55,9 +55,9 @@ public class UbuntuSBomGenerator extends UnixSBomGenerator
 	 */
 	public Bom generateSBom()
 	{
-		List<String> softwareList = generateListOfSoftware(SOFTWARE_LIST_CMD, '/',
-				"");
-
+		List<String> softwareList = generateListOfSoftware(SOFTWARE_LIST_CMD, '\n',
+                                null);
+		
 		Bom bom = new Bom();
 		
 		if (logger.isDebugEnabled())
@@ -162,7 +162,7 @@ public class UbuntuSBomGenerator extends UnixSBomGenerator
 			while ((line = reader.readLine()) != null)
 			{
 				line = line.trim();
-				if (line.startsWith("Installed"))
+				if (line.startsWith("Installed") || line.startsWith("Version"))
 				{
 					int index = line.indexOf(':');
 					version = line.substring(index + 1).trim();
