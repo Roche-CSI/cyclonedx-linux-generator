@@ -38,7 +38,7 @@ public class UbuntuSBomGenerator extends UnixSBomGenerator
 	
         private static final String SOFTWARE_INSTALLED_VERSION = "apt-cache show";
         private static final String SOFTWARE_DETAIL_CMD = "apt-cache show";
-        public static final String SOFTWARE_LIST_CMD = "apt-cache pkgnames";	
+        public static final String SOFTWARE_LIST_CMD = "dpkg --get-selections";
 	
 	private ProcessBuilder processBuilder = new ProcessBuilder();
 	
@@ -55,7 +55,7 @@ public class UbuntuSBomGenerator extends UnixSBomGenerator
 	 */
 	public Bom generateSBom()
 	{
-		List<String> softwareList = generateListOfSoftware(SOFTWARE_LIST_CMD, '\n',
+		List<String> softwareList = generateListOfSoftware(SOFTWARE_LIST_CMD, '\t',
                                 null);
 		
 		Bom bom = new Bom();
