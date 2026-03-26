@@ -200,7 +200,7 @@ public class SBomGenerator
 			if (logger.isDebugEnabled())
 				logger.debug("Generating bom.xml file from bom entries");
 			
-			Files.createDirectories(Paths.get("output"));
+			Files.createDirectories(output);
 			
 			createBomFile(output, bom, SBomCommons.AVAILABLE_FORMATS.XML);
 			createBomFile(output, bom, SBomCommons.AVAILABLE_FORMATS.JSON);
